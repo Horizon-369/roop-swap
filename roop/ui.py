@@ -37,12 +37,12 @@ status_label = None
 
 # todo: remove by native support -> https://github.com/TomSchimansky/CustomTkinter/issues/934
 class CTk(ctk.CTk, TkinterDnD.DnDWrapper):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.TkdndVersion = TkinterDnD._require(self)
 
 
-def init(start: Callable[[], None], destroy: Callable[[], None]) -> ctk.CTk:
+def init(start: Callable[[], None], destroy: Callable[[], None]):
     global ROOT, PREVIEW
 
     ROOT = create_root(start, destroy)
@@ -51,7 +51,7 @@ def init(start: Callable[[], None], destroy: Callable[[], None]) -> ctk.CTk:
     return ROOT
 
 
-def create_root(start: Callable[[], None], destroy: Callable[[], None]) -> ctk.CTk:
+def create_root(start: Callable[[], None], destroy: Callable[[], None]):
     global source_label, target_label, status_label
 
     ctk.deactivate_automatic_dpi_awareness()
@@ -120,7 +120,7 @@ def create_root(start: Callable[[], None], destroy: Callable[[], None]) -> ctk.C
     return root
 
 
-def create_preview(parent: ctk.CTkToplevel) -> ctk.CTkToplevel:
+def create_preview(parent: ctk.CTkToplevel):
     global preview_label, preview_slider
 
     preview = ctk.CTkToplevel(parent)
@@ -139,12 +139,12 @@ def create_preview(parent: ctk.CTkToplevel) -> ctk.CTkToplevel:
     return preview
 
 
-def update_status(text: str) -> None:
+def update_status(text: str):
     status_label.configure(text=text)
     ROOT.update()
 
 
-def select_source_path(source_path: Optional[str] = None) -> None:
+def select_source_path(source_path: Optional[str] = None):
     global RECENT_DIRECTORY_SOURCE
 
     if PREVIEW:
@@ -161,7 +161,7 @@ def select_source_path(source_path: Optional[str] = None) -> None:
         source_label.configure(image=None)
 
 
-def select_target_path(target_path: Optional[str] = None) -> None:
+def select_target_path(target_path: Optional[str] = None):
     global RECENT_DIRECTORY_TARGET
 
     if PREVIEW:
@@ -184,7 +184,7 @@ def select_target_path(target_path: Optional[str] = None) -> None:
         target_label.configure(image=None)
 
 
-def select_output_path(start: Callable[[], None]) -> None:
+def select_output_path(start: Callable[[], None]):
     global RECENT_DIRECTORY_OUTPUT
 
     if is_image(roop.globals.target_path):
@@ -199,14 +199,14 @@ def select_output_path(start: Callable[[], None]) -> None:
         start()
 
 
-def render_image_preview(image_path: str, size: Tuple[int, int]) -> ctk.CTkImage:
+def render_image_preview(image_path: str, size: Tuple[int, int]):
     image = Image.open(image_path)
     if size:
         image = ImageOps.fit(image, size, Image.LANCZOS)
     return ctk.CTkImage(image, size=image.size)
 
 
-def render_video_preview(video_path: str, size: Tuple[int, int], frame_number: int = 0) -> ctk.CTkImage:
+def render_video_preview(video_path: str, size: Tuple[int, int], frame_number: int = 0):
     capture = cv2.VideoCapture(video_path)
     if frame_number:
         capture.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
@@ -220,7 +220,7 @@ def render_video_preview(video_path: str, size: Tuple[int, int], frame_number: i
     cv2.destroyAllWindows()
 
 
-def toggle_preview() -> None:
+def toggle_preview():
     if PREVIEW.state() == 'normal':
         PREVIEW.unbind('<Right>')
         PREVIEW.unbind('<Left>')
@@ -232,7 +232,7 @@ def toggle_preview() -> None:
         PREVIEW.deiconify()
 
 
-def init_preview() -> None:
+def init_preview():
     PREVIEW.title('Preview [ ↕ Reference face ]')
     if is_image(roop.globals.target_path):
         preview_slider.pack_forget()
@@ -247,7 +247,7 @@ def init_preview() -> None:
         preview_slider.set(roop.globals.reference_frame_number)
 
 
-def update_preview(frame_number: int = 0) -> None:
+def update_preview(frame_number: int = 0):
     if roop.globals.source_path and roop.globals.target_path:
         temp_frame = get_video_frame(roop.globals.target_path, frame_number)
         if predict_frame(temp_frame):
@@ -271,7 +271,7 @@ def update_preview(frame_number: int = 0) -> None:
         preview_label.configure(image=image)
 
 
-def update_face_reference(steps: int) -> None:
+def update_face_reference(steps: int):
     clear_face_reference()
     reference_frame_number = int(preview_slider.get())
     roop.globals.reference_face_position += steps
@@ -279,7 +279,7 @@ def update_face_reference(steps: int) -> None:
     update_preview(reference_frame_number)
 
 
-def update_frame(steps: int) -> None:
+def update_frame(steps: int):
     frame_number = preview_slider.get() + steps
     preview_slider.set(frame_number)
     update_preview(preview_slider.get())

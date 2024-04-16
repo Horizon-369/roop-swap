@@ -10,7 +10,7 @@ FACE_ANALYSER = None
 THREAD_LOCK = threading.Lock()
 
 
-def get_face_analyser() -> Any:
+def get_face_analyser():
     global FACE_ANALYSER
 
     with THREAD_LOCK:
@@ -20,13 +20,13 @@ def get_face_analyser() -> Any:
     return FACE_ANALYSER
 
 
-def clear_face_analyser() -> Any:
+def clear_face_analyser():
     global FACE_ANALYSER
 
     FACE_ANALYSER = None
 
 
-def get_one_face(frame: Frame, position: int = 0) -> Optional[Face]:
+def get_one_face(frame: Frame, position: int = 0):
     many_faces = get_many_faces(frame)
     if many_faces:
         try:
@@ -36,14 +36,14 @@ def get_one_face(frame: Frame, position: int = 0) -> Optional[Face]:
     return None
 
 
-def get_many_faces(frame: Frame) -> Optional[List[Face]]:
+def get_many_faces(frame: Frame):
     try:
         return get_face_analyser().get(frame)
     except ValueError:
         return None
 
 
-def find_similar_face(frame: Frame, reference_face: Face) -> Optional[Face]:
+def find_similar_face(frame: Frame, reference_face: Face):
     many_faces = get_many_faces(frame)
     if many_faces:
         for face in many_faces:

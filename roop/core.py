@@ -26,7 +26,7 @@ warnings.filterwarnings('ignore', category=FutureWarning, module='insightface')
 warnings.filterwarnings('ignore', category=UserWarning, module='torchvision')
 
 
-def parse_args() -> None:
+def parse_args():
     signal.signal(signal.SIGINT, lambda signal_number, frame: destroy())
     program = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=100))
     program.add_argument('-s', '--source', help='select an source image', dest='source_path')
@@ -72,26 +72,26 @@ def parse_args() -> None:
     roop.globals.execution_threads = args.execution_threads
 
 
-def encode_execution_providers(execution_providers: List[str]) -> List[str]:
+def encode_execution_providers(execution_providers: List[str]):
     return [execution_provider.replace('ExecutionProvider', '').lower() for execution_provider in execution_providers]
 
 
-def decode_execution_providers(execution_providers: List[str]) -> List[str]:
+def decode_execution_providers(execution_providers: List[str]):
     return [provider for provider, encoded_execution_provider in zip(onnxruntime.get_available_providers(), encode_execution_providers(onnxruntime.get_available_providers()))
             if any(execution_provider in encoded_execution_provider for execution_provider in execution_providers)]
 
 
-def suggest_execution_providers() -> List[str]:
+def suggest_execution_providers():
     return encode_execution_providers(onnxruntime.get_available_providers())
 
 
-def suggest_execution_threads() -> int:
+def suggest_execution_threads():
     if 'CUDAExecutionProvider' in onnxruntime.get_available_providers():
         return 8
     return 1
 
 
-def limit_resources() -> None:
+def limit_resources():
     # prevent tensorflow memory leak
     gpus = tensorflow.config.experimental.list_physical_devices('GPU')
     for gpu in gpus:
@@ -112,7 +112,7 @@ def limit_resources() -> None:
             resource.setrlimit(resource.RLIMIT_DATA, (memory, memory))
 
 
-def pre_check() -> bool:
+def pre_check():
     if sys.version_info < (3, 9):
         update_status('Python version is not supported - please upgrade to 3.9 or higher.')
         return False
@@ -122,13 +122,13 @@ def pre_check() -> bool:
     return True
 
 
-def update_status(message: str, scope: str = 'ROOP.CORE') -> None:
+def update_status(message: str, scope: str = 'ROOP.CORE'):
     print(f'[{scope}] {message}')
     if not roop.globals.headless:
         ui.update_status(message)
 
 
-def start() -> None:
+def start():
     for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
         if not frame_processor.pre_start():
             return
@@ -199,13 +199,13 @@ def start() -> None:
         update_status('Processing to video failed!')
 
 
-def destroy() -> None:
+def destroy():
     if roop.globals.target_path:
         clean_temp(roop.globals.target_path)
     sys.exit()
 
 
-def run() -> None:
+def run():
     parse_args()
     if not pre_check():
         return

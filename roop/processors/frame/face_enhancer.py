@@ -16,7 +16,7 @@ THREAD_LOCK = threading.Lock()
 NAME = 'ROOP.FACE-ENHANCER'
 
 
-def get_face_enhancer() -> Any:
+def get_face_enhancer():
     global FACE_ENHANCER
 
     with THREAD_LOCK:
@@ -27,7 +27,7 @@ def get_face_enhancer() -> Any:
     return FACE_ENHANCER
 
 
-def get_device() -> str:
+def get_device():
     if 'CUDAExecutionProvider' in roop.globals.execution_providers:
         return 'cuda'
     if 'CoreMLExecutionProvider' in roop.globals.execution_providers:
@@ -35,30 +35,30 @@ def get_device() -> str:
     return 'cpu'
 
 
-def clear_face_enhancer() -> None:
+def clear_face_enhancer():
     global FACE_ENHANCER
 
     FACE_ENHANCER = None
 
 
-def pre_check() -> bool:
+def pre_check():
     download_directory_path = resolve_relative_path('../models')
     conditional_download(download_directory_path, ['https://github.com/TencentARC/GFPGAN/releases/download/v1.3.4/GFPGANv1.4.pth'])
     return True
 
 
-def pre_start() -> bool:
+def pre_start():
     if not is_image(roop.globals.target_path) and not is_video(roop.globals.target_path):
         update_status('Select an image or video for target path.', NAME)
         return False
     return True
 
 
-def post_process() -> None:
+def post_process():
     clear_face_enhancer()
 
 
-def enhance_face(target_face: Face, temp_frame: Frame) -> Frame:
+def enhance_face(target_face: Face, temp_frame: Frame):
     start_x, start_y, end_x, end_y = map(int, target_face['bbox'])
     padding_x = int((end_x - start_x) * 0.5)
     padding_y = int((end_y - start_y) * 0.5)
@@ -77,7 +77,7 @@ def enhance_face(target_face: Face, temp_frame: Frame) -> Frame:
     return temp_frame
 
 
-def process_frame(source_face: Face, reference_face: Face, temp_frame: Frame) -> Frame:
+def process_frame(source_face: Face, reference_face: Face, temp_frame: Frame):
     many_faces = get_many_faces(temp_frame)
     if many_faces:
         for target_face in many_faces:
@@ -85,7 +85,7 @@ def process_frame(source_face: Face, reference_face: Face, temp_frame: Frame) ->
     return temp_frame
 
 
-def process_frames(source_path: str, temp_frame_paths: List[str], update: Callable[[], None]) -> None:
+def process_frames(source_path: str, temp_frame_paths: List[str], update: Callable[[], None]):
     for temp_frame_path in temp_frame_paths:
         temp_frame = cv2.imread(temp_frame_path)
         result = process_frame(None, None, temp_frame)
@@ -94,11 +94,11 @@ def process_frames(source_path: str, temp_frame_paths: List[str], update: Callab
             update()
 
 
-def process_image(source_path: str, target_path: str, output_path: str) -> None:
+def process_image(source_path: str, target_path: str, output_path: str):
     target_frame = cv2.imread(target_path)
     result = process_frame(None, None, target_frame)
     cv2.imwrite(output_path, result)
 
 
-def process_video(source_path: str, temp_frame_paths: List[str]) -> None:
+def process_video(source_path: str, temp_frame_paths: List[str]):
     roop.processors.frame.core.process_video(None, temp_frame_paths, process_frames)

@@ -22,7 +22,7 @@ FRAME_PROCESSORS_INTERFACE = [
 ]
 
 
-def load_frame_processor_module(frame_processor: str) -> Any:
+def load_frame_processor_module(frame_processor: str):
     try:
         frame_processor_module = importlib.import_module(f'roop.processors.frame.{frame_processor}')
         for method_name in FRAME_PROCESSORS_INTERFACE:
@@ -35,7 +35,7 @@ def load_frame_processor_module(frame_processor: str) -> Any:
     return frame_processor_module
 
 
-def get_frame_processors_modules(frame_processors: List[str]) -> List[ModuleType]:
+def get_frame_processors_modules(frame_processors: List[str]):
     global FRAME_PROCESSORS_MODULES
 
     if not FRAME_PROCESSORS_MODULES:
@@ -45,7 +45,7 @@ def get_frame_processors_modules(frame_processors: List[str]) -> List[ModuleType
     return FRAME_PROCESSORS_MODULES
 
 
-def multi_process_frame(source_path: str, temp_frame_paths: List[str], process_frames: Callable[[str, List[str], Any], None], update: Callable[[], None]) -> None:
+def multi_process_frame(source_path: str, temp_frame_paths: List[str], process_frames: Callable[[str, List[str], Any], None], update: Callable[[], None]):
     with ThreadPoolExecutor(max_workers=roop.globals.execution_threads) as executor:
         futures = []
         queue = create_queue(temp_frame_paths)
@@ -57,14 +57,14 @@ def multi_process_frame(source_path: str, temp_frame_paths: List[str], process_f
             future.result()
 
 
-def create_queue(temp_frame_paths: List[str]) -> Queue[str]:
+def create_queue(temp_frame_paths: List[str]):
     queue: Queue[str] = Queue()
     for frame_path in temp_frame_paths:
         queue.put(frame_path)
     return queue
 
 
-def pick_queue(queue: Queue[str], queue_per_future: int) -> List[str]:
+def pick_queue(queue: Queue[str], queue_per_future: int):
     queues = []
     for _ in range(queue_per_future):
         if not queue.empty():
@@ -72,14 +72,14 @@ def pick_queue(queue: Queue[str], queue_per_future: int) -> List[str]:
     return queues
 
 
-def process_video(source_path: str, frame_paths: list[str], process_frames: Callable[[str, List[str], Any], None]) -> None:
+def process_video(source_path: str, frame_paths: list[str], process_frames: Callable[[str, List[str], Any], None]):
     progress_bar_format = '{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]'
     total = len(frame_paths)
     with tqdm(total=total, desc='Processing', unit='frame', dynamic_ncols=True, bar_format=progress_bar_format) as progress:
         multi_process_frame(source_path, frame_paths, process_frames, lambda: update_progress(progress))
 
 
-def update_progress(progress: Any = None) -> None:
+def update_progress(progress: Any = None):
     process = psutil.Process(os.getpid())
     memory_usage = process.memory_info().rss / 1024 / 1024 / 1024
     progress.set_postfix({
